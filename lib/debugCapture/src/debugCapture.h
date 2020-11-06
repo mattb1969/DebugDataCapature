@@ -26,23 +26,27 @@
 #ifndef DEBUGCAPTURE_H
 #define DEBUGCAPTURE_H
 
-char        currentFilename[20];
+#define     LIST_SEPERATOR      ';'
 
 
 class debugCapture {
     public:
         debugCapture();
-        int createFile(int fileSize, char* fileName);
-        bool closeFile();
+        int createFile();
         bool nextFile();
-        bool addDebugInfo(char* debugInfo);
+        bool addDebugInfo(char* debugInfo, int infoLength);
         bool listFiles(char* fileList);
-        bool openFile();
         bool readLine(char* debugLine);
         bool deleteFile();
         bool diskStatus();
     private:
-        bool flash_spi_initialise()
-}
+        const int   fileFILESIZE = 256;
+        char        currentFILENAME[20];
+        const char  *baseFILENAME = "debugFile_";
+        const char  *listSEPERATOR = ";";
+
+        bool flash_spi_initialise();
+        bool flash_fileexists(char *filename);
+};
 
 #endif /* DEBUGCAPTURE_H*/
