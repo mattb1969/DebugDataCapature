@@ -20,8 +20,14 @@ SerialFlashFile ff;
 debugCapture::debugCapture()
 {
     // Initalise variables
+    return;
+}
 
-    flash_spi_initialise();
+bool debugCapture::initialise()
+{
+    int status = false;
+    status = flash_spi_initialise();
+    return status;
 }
 
 int debugCapture::createFile()
@@ -110,13 +116,13 @@ bool debugCapture::addDebugInfo(char *debugInfo, int infoLength)
 
 bool debugCapture::listFiles(char *fileList)
 {
-
+// todo #8 This needs to return an array / list, not a string @mattb1969
     int status = false;
     //if (DEBUG) Serial.println("Reading Flash Files");
     SerialFlash.opendir();
     while (!status)
     {
-        char filename[64];
+        char filename[64] = {'\0'};
         uint32_t filesize;
 
         if (SerialFlash.readdir(filename, sizeof(filename), filesize))
@@ -129,8 +135,14 @@ bool debugCapture::listFiles(char *fileList)
             //    Serial.print(" bytes");
             //    Serial.println();
             //}
-            strcpy(fileList, filename);
-            strncpy(fileList, listSEPERATOR, 1);
+            //@todo #9 "sizeof(filename) returns 64, when the actual filename is much shorter"
+
+            //@todo #10 "need to resize fileList each time I add a filename"
+
+            fileList = (char*) realloc(fileList, (sizeof(fileList) + strlen(filename) * sizeof(char)));
+
+            strncat(fileList, filename, strlen(filename));
+            strncat(fileList, listSEPERATOR, 1);
         }
         else
         {
@@ -174,9 +186,17 @@ bool debugCapture::readLine(char *debugLine)
     return status;
 }
 
-bool debugCapture::deleteFile()
+bool debugCapture::deleteFile(char *filename)
 {
-    return true;
+    bool status = false;
+    // check if this file is already on the Flash chip
+    if (SerialFlash.exists(filename)) {
+      // delete the copy on the Flash chip, if different
+      Serial.println("  delete file from Flash chip");
+      SerialFlash.remove(filename);
+      status = true;
+    }
+    return status;
 }
 
 bool debugCapture::diskStatus()

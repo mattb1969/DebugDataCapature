@@ -32,12 +32,13 @@
 class debugCapture {
     public:
         debugCapture();
+        bool initialise();
         int createFile();
         bool nextFile();
         bool addDebugInfo(char* debugInfo, int infoLength);
-        bool listFiles(char* fileList);
+        bool listFiles(char *fileList);
         bool readLine(char* debugLine);
-        bool deleteFile();
+        bool deleteFile(char *filename);
         bool diskStatus();
     private:
         const int   fileFILESIZE = 256;
